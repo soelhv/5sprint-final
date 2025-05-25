@@ -18,6 +18,7 @@ type DaySteps struct {
 	personaldata.Personal
 }
 
+// Parse разбирает строку вида "<шаги>,<длительность>".
 // При любых ошибках возвращает ненулевую ошибку:
 //   - неверный формат строки
 //   - лишние пробелы внутри полей
@@ -27,50 +28,42 @@ type DaySteps struct {
 func (ds *DaySteps) Parse(datastring string) error {
 	parts := strings.Split(datastring, ",")
 	if len(parts) != 2 {
-		return errors.New("неверный формат строки")
+		return errors.New("wrong string format") // комментарии исправил на английский
 	}
 
 	stepStr := parts[0]
 	durStr := parts[1]
 
-	// пробелы вокруг полей недопустимы
-	if stepStr != strings.TrimSpace(stepStr) || durStr != strings.TrimSpace(durStr) {
-		return errors.New("неверный формат строки — лишние пробелы")
-	}
-	stepStr = strings.TrimSpace(stepStr)
-	durStr = strings.TrimSpace(durStr)
-
 	// шаги
 	stepStr = strings.TrimPrefix(stepStr, "+")
 	steps, err := strconv.Atoi(stepStr)
-	if err != nil || steps <= 0 {
-		return errors.New("некорректное количество шагов")
+	if err != nil {
+		// возвращаем ошибку преобразования
+		return fmt.Errorf("failed to parse step count %q: %w", stepStr, err)
+	}
+	if steps <= 0 {
+		// проверяем, что количество шагов положительное
+		return errors.New("step count must be a positive integer")
 	}
 	ds.Steps = steps
-
-	// проверка единицы измерения в конце: h, m или s
-	if !(strings.HasSuffix(durStr, "h") || strings.HasSuffix(durStr, "m") || strings.HasSuffix(durStr, "s")) {
-		return errors.New("отсутствует единица измерения времени")
-	}
 
 	// парсинг длительности
 	duration, err := time.ParseDuration(durStr)
 	if err != nil {
-		return errors.New("некорректная длительность прогулки")
+		return errors.New("invalid walk duration")
 	}
 	if duration <= 0 {
-		return errors.New("длительность должна быть больше нуля")
+		return errors.New("duration must be greater than zero")
 	}
 	ds.Duration = duration
 
 	return nil
 }
 
-// ActionInfo формирует строку с информацией о прогулке:
-// количество шагов, дистанция и сожжённые калории.
+// ActionInfo формирует строку с информацией о прогулке: количество шагов, дистанция и сожжённые калории.
 func (ds DaySteps) ActionInfo() (string, error) {
 	if ds.Duration == 0 {
-		return "", errors.New("длительность прогулки равна 0")
+		return "", errors.New("walk duration is zero")
 	}
 
 	dist := spentenergy.Distance(ds.Steps, ds.Height)
