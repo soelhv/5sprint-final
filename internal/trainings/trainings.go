@@ -31,7 +31,7 @@ type Training struct {
 func (t *Training) Parse(datastring string) error {
 	parts := strings.Split(datastring, ",")
 	if len(parts) != 3 {
-		return errors.New("invalid input format")
+		return errors.New("Error: invalid input format")
 	}
 
 	// Шаги
@@ -39,33 +39,33 @@ func (t *Training) Parse(datastring string) error {
 	// проверяем, что строка с количеством шагов не содержит пробелов
 	if stepStr != strings.TrimSpace(stepStr) {
 		// возвращаем ошибку, если в stepStr есть пробелы
-		return errors.New("количество шагов не должно содержать пробелов")
+		return errors.New("Error: step count must not contain spaces")
 	}
 	stepStr = strings.TrimPrefix(stepStr, "+")
 	steps, err := strconv.Atoi(stepStr)
 	if err != nil {
 		// сохраняем оригинальную ошибку преобразования
-		return fmt.Errorf("failed to parse step count %q: %w", stepStr, err)
+		return fmt.Errorf("Error: failed to parse step count %q: %w", stepStr, err)
 	}
 	if steps <= 0 {
 		// проверяем, что количество шагов положительное
-		return errors.New("step count must be a positive integer")
+		return errors.New("Error: step count must be a positive integer")
 	}
 	t.Steps = steps
 
 	// Тип тренировки
 	t.TrainingType = strings.TrimSpace(parts[1])
 	if t.TrainingType == "" {
-		return errors.New("training type not specified")
+		return errors.New("Error: training type not specified")
 	}
 
 	// Длительность
 	duration, err := time.ParseDuration(strings.TrimSpace(parts[2]))
 	if err != nil {
-		return errors.New("invalid duration format")
+		return errors.New("Error: invalid duration format")
 	}
 	if duration <= 0 {
-		return errors.New("duration must be greater than zero")
+		return errors.New("Error: duration must be greater than zero")
 	}
 	t.Duration = duration
 
@@ -77,7 +77,7 @@ func (t *Training) Parse(datastring string) error {
 // она возвращается в error. Иначе — текстовый отчёт и nil.
 func (t Training) ActionInfo() (string, error) {
 	if t.Personal.Weight <= 0 || t.Personal.Height <= 0 {
-		return "", errors.New("invalid user weight or height")
+		return "", errors.New("Error: invalid user weight or height")
 	}
 
 	distance := spentenergy.Distance(t.Steps, t.Personal.Height)
@@ -90,15 +90,15 @@ func (t Training) ActionInfo() (string, error) {
 	case "бег":
 		calories, err = spentenergy.RunningSpentCalories(t.Steps, t.Personal.Weight, t.Personal.Height, t.Duration)
 		if err != nil {
-			return "", fmt.Errorf("error calculating running calories: %w", err)
+			return "", fmt.Errorf("Error: calculating running calories: %w", err)
 		}
 	case "ходьба":
 		calories, err = spentenergy.WalkingSpentCalories(t.Steps, t.Personal.Weight, t.Personal.Height, t.Duration)
 		if err != nil {
-			return "", fmt.Errorf("error calculating walking calories: %w", err)
+			return "", fmt.Errorf("Error: calculating walking calories: %w", err)
 		}
 	default:
-		return "", errors.New("unknown training type")
+		return "", errors.New("неизвестный тип тренировки") // из задания на русском
 	}
 
 	report := fmt.Sprintf(

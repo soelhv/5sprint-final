@@ -28,7 +28,7 @@ type DaySteps struct {
 func (ds *DaySteps) Parse(datastring string) error {
 	parts := strings.Split(datastring, ",")
 	if len(parts) != 2 {
-		return errors.New("wrong string format") // комментарии исправил на английский
+		return errors.New("Error: wrong string format") // комментарии исправил на английский
 	}
 
 	stepStr := parts[0]
@@ -39,21 +39,21 @@ func (ds *DaySteps) Parse(datastring string) error {
 	steps, err := strconv.Atoi(stepStr)
 	if err != nil {
 		// возвращаем ошибку преобразования
-		return fmt.Errorf("failed to parse step count %q: %w", stepStr, err)
+		return fmt.Errorf("Error: failed to parse step count %q: %w", stepStr, err)
 	}
 	if steps <= 0 {
 		// проверяем, что количество шагов положительное
-		return errors.New("step count must be a positive integer")
+		return errors.New("Error: step count must be a positive integer")
 	}
 	ds.Steps = steps
 
 	// парсинг длительности
 	duration, err := time.ParseDuration(durStr)
 	if err != nil {
-		return errors.New("invalid walk duration")
+		return errors.New("Error: invalid walk duration")
 	}
 	if duration <= 0 {
-		return errors.New("duration must be greater than zero")
+		return errors.New("Error: duration must be greater than zero")
 	}
 	ds.Duration = duration
 
@@ -63,7 +63,7 @@ func (ds *DaySteps) Parse(datastring string) error {
 // ActionInfo формирует строку с информацией о прогулке: количество шагов, дистанция и сожжённые калории.
 func (ds DaySteps) ActionInfo() (string, error) {
 	if ds.Duration == 0 {
-		return "", errors.New("walk duration is zero")
+		return "", errors.New("Error: walk duration is zero")
 	}
 
 	dist := spentenergy.Distance(ds.Steps, ds.Height)

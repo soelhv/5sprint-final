@@ -42,16 +42,16 @@ func MeanSpeed(steps int, height float64, duration time.Duration) float64 {
 // Возвращает ошибку при неверных входных данных
 func RunningSpentCalories(steps int, weight, height float64, duration time.Duration) (float64, error) {
 	if steps <= 0 {
-		return 0, errors.New("invalid step value")
+		return 0, errors.New("Error: invalid step value")
 	}
 	if weight <= 0 {
-		return 0, errors.New("invalid weight value")
+		return 0, errors.New("Error: invalid weight value")
 	}
 	if height <= 0 {
-		return 0, errors.New("invalid height value")
+		return 0, errors.New("Error: invalid height value")
 	}
 	if duration <= 0 {
-		return 0, errors.New("invalid duration value")
+		return 0, errors.New("Error: invalid duration value")
 	}
 
 	// вычисляем среднюю скорость
@@ -66,16 +66,16 @@ func RunningSpentCalories(steps int, weight, height float64, duration time.Durat
 // Возвращает ошибку при неверных входных данных
 func WalkingSpentCalories(steps int, weight, height float64, duration time.Duration) (float64, error) {
 	if steps <= 0 {
-		return 0, errors.New("invalid step value")
+		return 0, errors.New("Error: invalid step value")
 	}
 	if weight <= 0 {
-		return 0, errors.New("invalid weight value")
+		return 0, errors.New("Error: invalid weight value")
 	}
 	if height <= 0 {
-		return 0, errors.New("invalid height value")
+		return 0, errors.New("Error: invalid height value")
 	}
 	if duration <= 0 {
-		return 0, errors.New("invalid duration value")
+		return 0, errors.New("Error: invalid duration value")
 	}
 
 	// получаем калории для бега и умножаем на коэффициент для ходьбы
